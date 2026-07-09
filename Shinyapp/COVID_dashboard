@@ -1,0 +1,98 @@
+---
+title: "DC_COVID Dashboard"
+author: "Seble Alemu"
+date: "7/16/2020"
+output: flexdashboard::flex_dashboard
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(plotly)
+library(leaflet)
+library(sp)
+library(flexdashboard)
+library(corrplot)
+ gen_covid <- read_csv("data/DC_COVID19.csv") 
+new_df <- gen_covid %>%
+  gather(`Number of Deaths`, `Cleared From Isolation`, key = `type`, value = `frequency`)
+colnames(new_df)[4] <- "dates"
+
+
+new_df2 <- gen_covid %>%
+  gather(`Total Positives`, `Number of Deaths`, `Cleared From Isolation`, key = `type`, value = `frequency`)
+colnames(new_df2)[3] <- "dates"
+```
+
+
+
+
+Watching COVID Progress in DC
+=======================================================================
+
+Column {data-width=300}
+-------------------------------------
+
+### COVID19 Deaths in DC
+```{r echo = FALSE}
+gen_covid %>%
+
+  ggplot() +
+  geom_point(mapping = aes(x = `Number of Deaths`, y = `Cleared From Isolation`)) +
+  geom_smooth(aes(`Number of Deaths`,`Cleared From Isolation`), method="lm") +
+  labs (
+    title = "Relation of Number of Deaths to COVID19 Patients Cleared from Isolation",
+    x = "Number of Deaths",
+    y = "Cleared From Isolation"
+  )+
+   theme_minimal()
+```
+
+### COVID19 Deaths Compared to Those Released from Isolation
+
+
+
+
+
+```{r echo = FALSE}
+new_df %>%
+  ggplot() +
+  geom_line(mapping = aes(x = dates, y = frequency, color = type)) +
+  labs (
+    title = "Number of Deaths and COVID19 Patients Cleared from Isolation Over Time",
+    x = "Date",
+    y = "Frequency"
+  ) +
+   theme_minimal()
+
+```
+
+
+Column {data-width=600}
+-------------------------------------
+
+### COVID19 Positives in relation to those Cleared from Isolation and Those Who Passed
+```{r  echo = FALSE}
+
+
+new_df2 %>% 
+  ggplot() +
+  geom_line(mapping = aes(x = dates, y = frequency, color = type)) +
+   labs (
+    title = "Relation of total COVID Positives to those Cleared from Isolation and Deaths",
+    x = "Date",
+    y = "Frequency"
+  )+
+   theme_minimal()
+```
+
+How DC Hospitals Manage COVID
+=======================================================================
+
+Column {data-width=600}
+-------------------------------------
+
+
